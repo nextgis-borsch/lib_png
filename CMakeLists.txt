@@ -108,15 +108,6 @@ set(libpng_sources
   pngwtran.c
   pngwutil.c
 )
-set(pngtest_sources
-  pngtest.c
-)
-set(pngvalid_sources
-  contrib/libtests/pngvalid.c
-)
-set(pngstest_sources
-  contrib/libtests/pngstest.c
-)
 # SOME NEEDED DEFINITIONS
 
 if(MSVC)
