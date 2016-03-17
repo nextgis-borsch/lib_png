@@ -105,14 +105,15 @@ function(find_extproject name)
         set(PULL_TIMEOUT 100)
     endif()
 
-    if(NOT DEFINED SUPRESS_WITH_MESSAGES)
-        set(SUPRESS_WITH_MESSAGES TRUE)
+    if(NOT DEFINED SUPRESS_VERBOSE_OUTPUT)
+        set(SUPRESS_VERBOSE_OUTPUT TRUE)
     endif()
 
     list(APPEND find_extproject_CMAKE_ARGS -DEP_BASE=${EP_BASE})   
     list(APPEND find_extproject_CMAKE_ARGS -DEP_URL=${EP_URL})       
     list(APPEND find_extproject_CMAKE_ARGS -DPULL_UPDATE_PERIOD=${PULL_UPDATE_PERIOD})       
     list(APPEND find_extproject_CMAKE_ARGS -DPULL_TIMEOUT=${PULL_TIMEOUT})       
+    list(APPEND find_extproject_CMAKE_ARGS -DSUPRESS_VERBOSE_OUTPUT=${SUPRESS_VERBOSE_OUTPUT})       
         
     include(ExternalProject)
     set_property(DIRECTORY PROPERTY "EP_BASE" ${EP_BASE})
@@ -139,6 +140,13 @@ function(find_extproject name)
         list(APPEND find_extproject_CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
     endif()        
     # list(APPEND find_extproject_CMAKE_ARGS -DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES})       
+    if(CMAKE_GENERATOR_TOOLSET)
+        list(APPEND find_extproject_CMAKE_ARGS -DCMAKE_GENERATOR_TOOLSET=${CMAKE_GENERATOR_TOOLSET})
+    endif() 
+    
+    if(_WIN32_WINNT)
+        list(APPEND find_extproject_CMAKE_ARGS -D_WIN32_WINNT=${_WIN32_WINNT})
+    endif() 
     
     if(EXISTS ${EP_BASE}/Build/${name}_EP/ext_options.cmake)         
         include(${EP_BASE}/Build/${name}_EP/ext_options.cmake)
@@ -154,7 +162,7 @@ function(find_extproject name)
     get_cmake_property(_variableNames VARIABLES)
     string (REGEX MATCHALL "(^|;)WITH_[A-Za-z0-9_]*" _matchedVars "${_variableNames}") 
     foreach(_variableName ${_matchedVars})
-        if(NOT SUPRESS_WITH_MESSAGES)
+        if(NOT SUPRESS_VERBOSE_OUTPUT)
             message(STATUS "${_variableName}=${${_variableName}}")
         endif()    
         list(APPEND find_extproject_CMAKE_ARGS -D${_variableName}=${${_variableName}})
@@ -167,6 +175,7 @@ function(find_extproject name)
     ExternalProject_Add(${name}_EP
         GIT_REPOSITORY ${EP_URL}/${repo_name}
         CMAKE_ARGS ${find_extproject_CMAKE_ARGS}
+        UPDATE_DISCONNECTED 1
     )
         
     find_package(Git)
@@ -206,6 +215,9 @@ function(find_extproject name)
            
         #add to list imported
         include_exports_path(${INCLUDE_EXPORT_PATH})
+    else()
+        message(WARNING "The path ${INCLUDE_EXPORT_PATH} not exist")
+        return()
     endif()
     
     add_dependencies(${IMPORTED_TARGETS} ${name}_EP)  
@@ -227,7 +239,7 @@ function(find_extproject name)
                         if(TARGET ${INTERFACE_TARGET})
                             set(IMPORTED_TARGET_PATH ${IMPORTED_TARGET_PATH} ${LINK_INTERFACE_LIB})
                         else()
-                            message(STATUS "${PROJECT_NAME} -- NO TARGET ${LINK_INTERFACE_LIB} -> INTERFACE_TARGET ${INTERFACE_TARGET}")
+                            message(STATUS "NO TARGET ${LINK_INTERFACE_LIB} -> INTERFACE_TARGET ${INTERFACE_TARGET}")
                         endif()    
                     endif()
                 endif()
@@ -241,7 +253,9 @@ function(find_extproject name)
         include_directories(${EP_BASE}/Install/${name}_EP/include/${inc})
     endforeach ()    
     
-    install( DIRECTORY ${EP_BASE}/Install/${name}_EP/ DESTINATION ${CMAKE_INSTALL_PREFIX} )
+    install( DIRECTORY ${EP_BASE}/Install/${name}_EP/ 
+             DESTINATION / #${CMAKE_INSTALL_PREFIX} 
+             COMPONENT libraries)
         
     set(EXPORTS_PATHS ${EXPORTS_PATHS} PARENT_SCOPE)
 endfunction()
