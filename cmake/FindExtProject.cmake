@@ -74,6 +74,13 @@ function(include_exports_path include_path)
     if(PATH_INDEX EQUAL -1)
         list(APPEND EXPORTS_PATHS "${include_path}")
         set(EXPORTS_PATHS "${EXPORTS_PATHS}" PARENT_SCOPE)
+        # Add imported library have limit scope
+        # During the export cmake add library without GLOBAL parameter and no
+        # way to change this bihaviour. Let's fix it.
+        file (READ ${include_path} _file_content)
+        string (REPLACE "IMPORTED)" "IMPORTED GLOBAL)" _file_content "${_file_content}")
+        file(WRITE ${include_path} "${_file_content}") 
+        
         include(${include_path})
     endif()
 endfunction() 
@@ -125,27 +132,26 @@ function(find_extproject name)
     if(_list_size EQUAL 0)
         list(APPEND find_extproject_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EP_BASE}/Install/${name}_EP)
     endif()
+    unset(_matchedVars)
     
     # search BUILD_SHARED_LIBS
     string (REGEX MATCHALL "(^|;)-DBUILD_SHARED_LIBS[A-Za-z0-9_]*" _matchedVars "${find_extproject_CMAKE_ARGS}")   
-    unset(_matchedVars)
     list(LENGTH _matchedVars _list_size)    
     if(_list_size EQUAL 0)
         list(APPEND find_extproject_CMAKE_ARGS -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS})
     endif()
+    unset(_matchedVars)
     
-    # set some arguments          
-    list(APPEND find_extproject_CMAKE_ARGS -DCMAKE_GENERATOR=${CMAKE_GENERATOR})    
+    # set some arguments  
+    if(CMAKE_GENERATOR)        
+        list(APPEND find_extproject_CMAKE_ARGS -DCMAKE_GENERATOR=${CMAKE_GENERATOR})    
+    endif()
     if(CMAKE_BUILD_TYPE)
         list(APPEND find_extproject_CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
     endif()        
     # list(APPEND find_extproject_CMAKE_ARGS -DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES})       
     if(CMAKE_GENERATOR_TOOLSET)
         list(APPEND find_extproject_CMAKE_ARGS -DCMAKE_GENERATOR_TOOLSET=${CMAKE_GENERATOR_TOOLSET})
-    endif() 
-    
-    if(_WIN32_WINNT)
-        list(APPEND find_extproject_CMAKE_ARGS -D_WIN32_WINNT=${_WIN32_WINNT})
     endif() 
     
     if(EXISTS ${EP_BASE}/Build/${name}_EP/ext_options.cmake)         
@@ -172,11 +178,13 @@ function(find_extproject name)
     # get some properties from <cmakemodules>/findext${name}.cmake file
     include(FindExt${name})
   
-    ExternalProject_Add(${name}_EP
-        GIT_REPOSITORY ${EP_URL}/${repo_name}
-        CMAKE_ARGS ${find_extproject_CMAKE_ARGS}
-        UPDATE_DISCONNECTED 1
-    )
+    if(NOT TARGET ${name}_EP)
+        ExternalProject_Add(${name}_EP
+            GIT_REPOSITORY ${EP_URL}/${repo_name}
+            CMAKE_ARGS ${find_extproject_CMAKE_ARGS}
+            UPDATE_DISCONNECTED 1
+        )
+    endif()    
         
     find_package(Git)
     if(NOT GIT_FOUND)
