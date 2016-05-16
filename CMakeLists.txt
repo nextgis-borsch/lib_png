@@ -114,6 +114,14 @@ set(libpng_sources
   pngwtran.c
   pngwutil.c
 )
+
+if(CMAKE_CROSSCOMPILING AND NEON)
+    set(libpng_sources ${libpng_sources}
+        arm/arm_init.c
+        arm/filter_neon.S 
+        arm/filter_neon_intrinsics.c
+    )
+endif()
 # SOME NEEDED DEFINITIONS
 
 if(MSVC)
