@@ -149,6 +149,10 @@ if(PNG_SHARED)
 endif()
 
 if(PNG_STATIC)
+    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+        set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
+        set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )  
+    endif()
   # does not work without changing name
   set(PNG_LIB_NAME_STATIC ${PNG_LIB_NAME}_static)
   add_library(${PNG_LIB_NAME_STATIC} STATIC ${libpng_sources})
