@@ -115,7 +115,7 @@ set(libpng_sources
   pngwutil.c
 )
 
-if(CMAKE_CROSSCOMPILING AND NEON)
+if(CMAKE_CROSSCOMPILING AND ( NEON OR CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64 ))
     set(libpng_sources ${libpng_sources}
         arm/arm_init.c
         arm/filter_neon.S 
