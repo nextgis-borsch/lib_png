@@ -18,12 +18,22 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 project(libpng C)
 
-include(GNUInstallDirs)
+if(OSX_FRAMEWORK)
+  set(PNG_FRAMEWORK ON)
+  set(INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/Applications" CACHE INTERNAL "Installation directory for executables" FORCE)
+  set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/Library/Frameworks" CACHE INTERNAL "Installation directory for libraries" FORCE)
+  set(SKIP_INSTALL_HEADERS ON)
+  set(SKIP_INSTALL_EXECUTABLES ON)
+  set(SKIP_INSTALL_FILES ON)
+  set(SKIP_INSTALL_EXPORT ON)
+else()
+  include(GNUInstallDirs)
 
-set(INSTALL_BIN_DIR ${CMAKE_INSTALL_BINDIR} CACHE INTERNAL "Installation directory for executables" FORCE)
-set(INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE INTERNAL "Installation directory for libraries" FORCE)
-set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
-set(INSTALL_MAN_DIR ${CMAKE_INSTALL_MANDIR} CACHE INTERNAL "Installation directory for man files" FORCE)
+  set(INSTALL_BIN_DIR ${CMAKE_INSTALL_BINDIR} CACHE INTERNAL "Installation directory for executables" FORCE)
+  set(INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE INTERNAL "Installation directory for libraries" FORCE)
+  set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
+  set(INSTALL_MAN_DIR ${CMAKE_INSTALL_MANDIR} CACHE INTERNAL "Installation directory for man files" FORCE)
+endif()
 
 if(CMAKE_GENERATOR_TOOLSET MATCHES "v([0-9]+)_xp")
     add_definitions(-D_WIN32_WINNT=0x0501)
@@ -61,10 +71,12 @@ endif()
 set(TARGET_LINK_LIB ${TARGET_LINK_LIB} ${M_LIBRARY})
 
 # COMMAND LINE OPTIONS
+if(NOT OSX_FRAMEWORK)
 if(BUILD_SHARED_LIBS)
     set(PNG_SHARED ON)
 else()
     set(PNG_STATIC ON)
+endif()
 endif()
 
 # Many more configuration options could be added here
@@ -118,7 +130,7 @@ set(libpng_sources
 if(CMAKE_CROSSCOMPILING AND ( NEON OR CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64 ))
     set(libpng_sources ${libpng_sources}
         arm/arm_init.c
-        arm/filter_neon.S 
+        arm/filter_neon.S
         arm/filter_neon_intrinsics.c
     )
 endif()
@@ -151,7 +163,7 @@ endif()
 if(PNG_STATIC)
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
         set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
-        set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )  
+        set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
     endif()
   # does not work without changing name
   set(PNG_LIB_NAME_STATIC ${PNG_LIB_NAME}_static)
@@ -191,7 +203,7 @@ if(BUILD_SHARED_LIBS)
     set(EXPORT_NAME ${PROJECT_NAME})
 else()
     set(EXPORT_NAME ${PROJECT_NAME}static)
-endif()    
+endif()
 export(TARGETS ${PNG_LIB_TARGETS} FILE ${EXPORT_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
 
 if(PNG_SHARED AND WIN32)
@@ -293,7 +305,7 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
       LIBRARY DESTINATION ${INSTALL_LIB_DIR}
       ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
       FRAMEWORK DESTINATION ${INSTALL_LIB_DIR})
-      
+
   if(CMAKE_VERSION VERSION_EQUAL "3.0.0" OR
     CMAKE_VERSION VERSION_GREATER "3.0.0")
     CMAKE_POLICY(SET CMP0026 OLD)
@@ -376,4 +388,3 @@ add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_D
 # to create msvc import lib for mingw compiled shared lib
 # pexports libpng.dll > libpng.def
 # lib /def:libpng.def /machine:x86
-
