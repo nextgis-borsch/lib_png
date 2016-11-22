@@ -29,7 +29,6 @@
 
 #temp files
 *~
-.DS_Store
 
 # Build
 /build
