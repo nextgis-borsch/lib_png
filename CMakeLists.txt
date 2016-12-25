@@ -27,10 +27,13 @@ if(OSX_FRAMEWORK)
   set(PNG_FRAMEWORK ON CACHE INTERNAL "OSX library type" FORCE)
   set(INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/Applications" CACHE INTERNAL "Installation directory for executables" FORCE)
   set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/Library/Frameworks" CACHE INTERNAL "Installation directory for libraries" FORCE)
+  set(INSTALL_INC_DIR "${INSTALL_LIB_DIR}/png.framework/Headers" CACHE INTERNAL "Installation directory for headers" FORCE)
   set(SKIP_INSTALL_HEADERS ON)
   set(SKIP_INSTALL_EXECUTABLES ON)
   set(SKIP_INSTALL_FILES ON)
   set(SKIP_INSTALL_EXPORT ON)
+  set(CMAKE_MACOSX_RPATH ON)
+  set(CMAKE_INSTALL_RPATH "@executable_path/../../../../Library/Frameworks")
 else()
   include(GNUInstallDirs)
 
@@ -182,7 +185,7 @@ if(PNG_STATIC)
 endif()
 
 if(PNG_FRAMEWORK)
-  set(PNG_LIB_NAME_FRAMEWORK ${PNG_LIB_NAME}_framework)
+  set(PNG_LIB_NAME_FRAMEWORK png)
   add_library(${PNG_LIB_NAME_FRAMEWORK} SHARED ${libpng_sources})
   list(APPEND PNG_LIB_TARGETS ${PNG_LIB_NAME_FRAMEWORK})
   set_target_properties(${PNG_LIB_NAME_FRAMEWORK} PROPERTIES
@@ -192,8 +195,7 @@ if(PNG_FRAMEWORK)
     MACOSX_FRAMEWORK_BUNDLE_VERSION ${PNGLIB_VERSION}
     MACOSX_FRAMEWORK_IDENTIFIER org.libpng.libpng
     XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
-    PUBLIC_HEADER "${libpng_public_hdrs}"
-    OUTPUT_NAME png)
+    PUBLIC_HEADER "${libpng_public_hdrs}")
   target_link_extlibraries(${PNG_LIB_NAME_FRAMEWORK})
 endif()
 
@@ -204,8 +206,30 @@ if(NOT PNG_LIB_TARGETS)
     " PNG_STATIC, PNG_SHARED, PNG_FRAMEWORK")
 endif()
 
-set(EXPORT_NAME ${PROJECT_NAME})
-export(TARGETS ${PNG_LIB_TARGETS} FILE ${EXPORT_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
+set(EXPORT_NAME png)
+
+if (REGISTER_PACKAGE)
+    export(TARGETS ${PNG_LIB_TARGETS} FILE ${EXPORT_NAME}-exports.cmake)
+    set(EXPORT_PACKAGE_NAME PNG)
+    set(EXPORT_PACKAGE_NAME_UPPER PNG)
+    set(EXPORT_PACKAGE_LIB_NAME ${EXPORT_NAME})
+    set(VERSION ${PNGLIB_VERSION})
+
+    export(PACKAGE ${EXPORT_PACKAGE_NAME})
+
+    include(CMakePackageConfigHelpers)
+    configure_package_config_file(
+        ${CMAKE_SOURCE_DIR}/cmake/PackageConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}Config.cmake
+        INSTALL_DESTINATION ${INSTALL_LIB_DIR}/cmake
+        PATH_VARS INSTALL_INC_DIR )
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}ConfigVersion.cmake
+        VERSION ${VERSION}
+        COMPATIBILITY AnyNewerVersion )
+else()
+    export(TARGETS ${PNG_LIB_TARGETS} FILE ${EXPORT_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
+endif()
 
 if(PNG_SHARED AND WIN32)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES DEFINE_SYMBOL PNG_BUILD_DLL)
