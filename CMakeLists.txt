@@ -299,13 +299,14 @@ if(NOT WIN32 OR CYGWIN OR MINGW)
 endif(NOT WIN32 OR CYGWIN OR MINGW)
 
 # SET UP LINKS
-if(PNG_SHARED)
+if(PNG_SHARED OR OSX_FRAMEWORK)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
 #   VERSION 16.${PNGLIB_RELEASE}.1.6.21
     VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
 endif()
+
 if(PNG_STATIC)
   # MSVC doesn't use a different file extension for shared vs. static
   # libs.  We are able to change OUTPUT_NAME to remove the _static
