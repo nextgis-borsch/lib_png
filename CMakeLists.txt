@@ -200,6 +200,7 @@ if(PNG_FRAMEWORK)
     XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
     PUBLIC_HEADER "${libpng_public_hdrs}")
   target_link_extlibraries(${PNG_LIB_NAME_FRAMEWORK})
+  set(PNG_LIB_NAME ${PNG_LIB_NAME_FRAMEWORK}) # For set_target_properties down
 endif()
 
 if(NOT PNG_LIB_TARGETS)
