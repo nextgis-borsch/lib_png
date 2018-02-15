@@ -1,0 +1,12 @@
+.,.,,"ANNOUNCE,CHANGES,INSTALL,LICENSE,README,h,c,3,5,in,png,dfa"
+arm,arm,,*
+contrib,contrib,,txt
+contrib/libtests,contrib/libtests,,"c,h"
+contrib/tools,contrib/tools,,"c,h"
+contrib/pngsuite,contrib/pngsuite,,png
+contrib/testpngs,contrib/testpngs,,png
+contrib/visupng,contrib/visupng,,"c,h,png,ico,png,rc"
+intel,intel,,*
+mips,mips,,*
+powerpc,powerpc,,*
+scripts,scripts,,"prebuilt,cmake,c,dfa,awk,h,out,lst,chk,def,in"
