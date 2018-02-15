@@ -107,7 +107,6 @@ endif()
 option(PNG_TESTS  "Build libpng tests" ON)
 
 # Many more configuration options could be added here
-option(PNG_FRAMEWORK "Build OS X framework" ${OSX_FRAMEWORK})
 option(PNG_DEBUG     "Build with debug output" OFF)
 option(PNGARG        "Disable ANSI-C prototypes" OFF)
 
