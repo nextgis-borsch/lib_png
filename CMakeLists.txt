@@ -1,11 +1,19 @@
 # CMakeLists.txt
 
-# Copyright (C) 2007-2015 Glenn Randers-Pehrson
-# Copyright (C) 2016-2018, NextGIS <info@nextgis.com>
+# Copyright (C) 2007,2009-2017 Glenn Randers-Pehrson
+# Written by Christian Ehrlicher, 2007
+# Revised by Roger Lowman, 2009-2010
+# Revised by Clifford Yapp, 2011-2012
+# Revised by Roger Leigh, 2016
+# Revised by Andreas Franek, 2016
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
+#
+# Modified for borsch v2
+# Copyright (C) 2016-2018, NextGIS <info@nextgis.com>
+# Auhor: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.com>
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
