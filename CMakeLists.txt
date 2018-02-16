@@ -692,7 +692,7 @@ if(PNG_TESTS)
   png_add_test(NAME pngtest COMMAND pngtest FILES "${PNGTEST_PNG}")
 
   add_executable(pngvalid ${pngvalid_sources})
-  target_link_libraries(pngvalid png)
+  target_link_libraries(pngvalid png  ${ZLIB_LIBRARIES})
 
   png_add_test(NAME pngvalid-gamma-16-to-8
                COMMAND pngvalid OPTIONS --gamma-16-to-8)
@@ -798,7 +798,7 @@ endif()
 
 if(PNG_SHARED OR PNG_FRAMEWORK)
   add_executable(pngfix ${pngfix_sources})
-  target_link_libraries(pngfix png)
+  target_link_libraries(pngfix png ${ZLIB_LIBRARIES})
   set(PNG_BIN_TARGETS pngfix)
 
   add_executable(png-fix-itxt ${png_fix_itxt_sources})
