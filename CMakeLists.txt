@@ -667,6 +667,16 @@ function(png_add_test)
 endfunction()
 
 if(PNG_TESTS)
+    if(WIN32)
+        file(GLOB_RECURSE IMPORTED_WIN_DLLS ${CMAKE_BINARY_DIR}/third-party/*.dll)
+        foreach(IMPORTED_WIN_DLL ${IMPORTED_WIN_DLLS})
+            add_custom_command(TARGET ${PNG_LIB_TARGETS}
+                                POST_BUILD
+                                COMMAND ${CMAKE_COMMAND} -E copy ${IMPORTED_WIN_DLL} $<TARGET_FILE_DIR:${PNG_LIB_TARGETS}>
+                                COMMENT "Copy ${IMPORTED_WIN_DLL} to $<TARGET_FILE_DIR:${PNG_LIB_TARGETS}>"
+                            )
+        endforeach()
+    endif()
   # Find test PNG files by globbing, but sort lists to ensure
   # consistency between different filesystems.
   file(GLOB PNGSUITE_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/*.png")
