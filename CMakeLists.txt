@@ -792,7 +792,7 @@ if(PNG_SHARED OR PNG_FRAMEWORK)
   set(PNG_BIN_TARGETS pngfix)
 
   add_executable(png-fix-itxt ${png_fix_itxt_sources})
-  target_link_libraries(png-fix-itxt ${ZLIB_LIBRARY} ${M_LIBRARY})
+  target_link_extlibraries(png-fix-itxt)
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
 
