@@ -1006,7 +1006,7 @@ if(REGISTER_PACKAGE)
     export(PACKAGE ${PACKAGE_UPPER_NAME})
 endif()
 
-# Create the ZLIBConfig.cmake file
+# Create the <Package>Config.cmake file
 configure_file(cmake/PackageConfig.cmake.in
     ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY)
 
