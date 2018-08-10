@@ -582,6 +582,7 @@ if(PNG_SHARED)
 endif()
 
 if(PNG_STATIC)
+    set(PACKAGE_NAME png_static)
   # does not work without changing name
   set(PNG_LIB_NAME_STATIC png_static)
   add_library(png_static STATIC ${libpng_sources})
