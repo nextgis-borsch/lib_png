@@ -667,7 +667,7 @@ function(png_add_test)
   endif()
 endfunction()
 
-if(PNG_TESTS AND NOT PNG_STATIC)
+if(PNG_TESTS AND NOT CMAKE_CROSSCOMPILING)
     if(WIN32)
         file(GLOB_RECURSE IMPORTED_WIN_DLLS ${CMAKE_BINARY_DIR}/third-party/*.dll)
         foreach(IMPORTED_WIN_DLL ${IMPORTED_WIN_DLLS})
