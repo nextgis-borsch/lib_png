@@ -352,7 +352,7 @@ function(find_extproject name)
     endif()
 
     if(find_extproject_EXACT) # If version mark exact, set branch name as tags/v1.X.X
-        set(repo_branch "tags/v${find_extproject_VERSION}")
+        set(repo_branch "v${find_extproject_VERSION}")
     elseif(NOT DEFINED repo_branch) # If repo_branch is not defined - set it to master.
         set(repo_branch master)
     endif()
@@ -393,6 +393,10 @@ function(find_extproject name)
         set(error_code 1)
         set(number_of_tries 0)
         while(error_code AND number_of_tries LESS 3)
+            set(BRANCH)
+            if(find_extproject_EXACT)
+                set(BRANCH --branch ${repo_branch})
+            endif()
             execute_process(
                 COMMAND ${GIT_EXECUTABLE} clone --depth 1 ${repo_url} ${name}_EP
                 WORKING_DIRECTORY  ${EXT_DOWNLOAD_DIR}

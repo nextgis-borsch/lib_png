@@ -121,7 +121,7 @@ option(PNGARG        "Disable ANSI-C prototypes" OFF)
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable Hardware Optimizations" ON)
 
 if(CMAKE_CROSSCOMPILING AND ( NEON OR ENABLE_NEON OR CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64 ))
-    set(PNG_ARM_NEON ON)
+    set(PNG_ARM_NEON "on")
 endif()
 
 if(PNG_HARDWARE_OPTIMIZATIONS)
