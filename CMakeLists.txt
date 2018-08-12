@@ -958,16 +958,16 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
   install(FILES libpng.3 libpngpf.3      DESTINATION ${INSTALL_MAN_DIR}/man3)
   install(FILES png.5                    DESTINATION ${INSTALL_MAN_DIR}/man5)
   # Install pkg-config files
-  if(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
-            DESTINATION ${INSTALL_LIB_DIR}/pkgconfig)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
-            DESTINATION ${INSTALL_BIN_DIR})
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
-            DESTINATION ${INSTALL_LIB_DIR}/pkgconfig)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
-            DESTINATION ${INSTALL_BIN_DIR})
-  endif(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)
+  # if(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)
+  #   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
+  #           DESTINATION ${INSTALL_LIB_DIR}/pkgconfig)
+  #   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
+  #           DESTINATION ${INSTALL_BIN_DIR})
+  #   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
+  #           DESTINATION ${INSTALL_LIB_DIR}/pkgconfig)
+  #   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
+  #           DESTINATION ${INSTALL_BIN_DIR})
+  # endif(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)
 endif()
 
 # On versions of CMake that support it, create an export file CMake
