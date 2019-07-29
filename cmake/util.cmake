@@ -3,7 +3,7 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, dmitry.baryshnikov@nexgis.com
 ################################################################################
-# Copyright (C) 2015, NextGIS <info@nextgis.com>
+# Copyright (C) 2015-2019, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -102,14 +102,24 @@ macro( find_exthost_program )
     endif()
 endmacro()
 
+function(get_prefix prefix)
+  if(BUILD_STATIC_LIBS)
+  set(STATIC_PREFIX "static-")
+    if(ANDROID)
+      set(STATIC_PREFIX "${STATIC_PREFIX}android-${ANDROID_ABI}-")
+    elseif(IOS)
+      set(STATIC_PREFIX "${STATIC_PREFIX}${IOS_PLATFORM}${IOS_ARCH}-${ANDROID_ABI}-")
+    endif()
+  endif()
+  set(${prefix} ${STATIC_PREFIX} PARENT_SCOPE)
+endfunction()
+
 
 function(get_cpack_filename ver name)
     get_compiler_version(COMPILER)
-    if(BUILD_STATIC_LIBS)
-        set(STATIC_PREFIX "static-")
-    endif()
+    get_prefix(STATIC_PREFIX)
 
-    set(${name} ${PACKAGE_NAME}-${STATIC_PREFIX}${ver}-${COMPILER} PARENT_SCOPE)
+    set(${name} ${PACKAGE_NAME}-${ver}-${STATIC_PREFIX}${COMPILER} PARENT_SCOPE)
 endfunction()
 
 function(get_compiler_version ver)
