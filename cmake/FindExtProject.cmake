@@ -3,8 +3,8 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, polimax@mail.ru
 ################################################################################
-# Copyright (C) 2015-2018, NextGIS <info@nextgis.com>
-# Copyright (C) 2015-2018 Dmitry Baryshnikov
+# Copyright (C) 2015-2019, NextGIS <info@nextgis.com>
+# Copyright (C) 2015-2019 Dmitry Baryshnikov
 #
 # This script is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -161,7 +161,10 @@ function(find_extproject name)
         )
         # Execute find_package and send version, libraries, includes upper cmake script.
         # The CMake folder in root folder is prefered
-        if(OSX_FRAMEWORK AND NOT EXISTS ${EXT_INSTALL_DIR}/${BINARY_NAME}/CMake AND EXISTS ${EXT_INSTALL_DIR}/${BINARY_NAME}/Library/Frameworks)
+        string(TOUPPER ${name} UPPER_NAME)
+        if(CMAKE_CROSSCOMPILING)
+            set(${UPPER_NAME}_DIR ${EXT_INSTALL_DIR}/${BINARY_NAME}/share/${name}/CMake)
+        elseif(OSX_FRAMEWORK AND NOT EXISTS ${EXT_INSTALL_DIR}/${BINARY_NAME}/CMake AND EXISTS ${EXT_INSTALL_DIR}/${BINARY_NAME}/Library/Frameworks)
             set(CMAKE_PREFIX_PATH ${EXT_INSTALL_DIR}/${BINARY_NAME}/Library/Frameworks)
         else()
             set(CMAKE_PREFIX_PATH ${EXT_INSTALL_DIR}/${BINARY_NAME})
@@ -176,8 +179,7 @@ function(find_extproject name)
         endif()
 
         find_package(${name} NO_MODULE ${FIND_PROJECT_ARG})
-
-        string(TOUPPER ${name} UPPER_NAME)
+        
         set(${UPPER_NAME}_FOUND ${${UPPER_NAME}_FOUND} PARENT_SCOPE)
         set(${UPPER_NAME}_VERSION ${${UPPER_NAME}_VERSION} PARENT_SCOPE)
         set(${UPPER_NAME}_VERSION_STR ${${UPPER_NAME}_VERSION_STR} PARENT_SCOPE)
