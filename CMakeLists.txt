@@ -605,7 +605,7 @@ if(PNG_STATIC)
     # msvc does not append 'lib' - do it here to have consistent name
     set_target_properties(png_static PROPERTIES PREFIX "lib")
   endif()
-  target_link_extlibraries(png_static)
+  # target_link_extlibraries(png_static)
 endif()
 
 if(PNG_FRAMEWORK)
@@ -686,12 +686,12 @@ if(PNG_TESTS AND NOT CMAKE_CROSSCOMPILING)
   set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
 
   add_executable(pngtest ${pngtest_sources})
-  target_link_libraries(pngtest png)
+  target_link_libraries(pngtest PRIVATE png)
 
   png_add_test(NAME pngtest COMMAND pngtest FILES "${PNGTEST_PNG}")
 
   add_executable(pngvalid ${pngvalid_sources})
-  target_link_libraries(pngvalid PRIVATE png  ${ZLIB_LIBRARIES})
+  target_link_libraries(pngvalid PRIVATE png ${ZLIB_LIBRARIES})
 
   png_add_test(NAME pngvalid-gamma-16-to-8
                COMMAND pngvalid OPTIONS --gamma-16-to-8)
@@ -723,7 +723,7 @@ if(PNG_TESTS AND NOT CMAKE_CROSSCOMPILING)
                COMMAND pngvalid OPTIONS --transform)
 
   add_executable(pngstest ${pngstest_sources})
-  target_link_libraries(pngstest png)
+  target_link_libraries(pngstest PRIVATE png)
 
   foreach(gamma_type 1.8 linear none sRGB)
     foreach(alpha_type none alpha)
@@ -778,7 +778,7 @@ if(PNG_TESTS AND NOT CMAKE_CROSSCOMPILING)
   endforeach()
 
   add_executable(pngunknown ${pngunknown_sources})
-  target_link_libraries(pngunknown png)
+  target_link_libraries(pngunknown PRIVATE png)
 
   png_add_test(NAME pngunknown-discard COMMAND pngunknown OPTIONS --strict default=discard FILES "${PNGTEST_PNG}")
   png_add_test(NAME pngunknown-IDAT COMMAND pngunknown OPTIONS --strict default=discard IDAT=save FILES "${PNGTEST_PNG}")
@@ -990,7 +990,7 @@ add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_D
 # Export package ===============================================================
 
 # Add path to includes to build-tree export
-target_include_directories(${PNG_LIB_TARGETS} PUBLIC
+target_include_directories(${PNG_LIB_TARGETS} INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
