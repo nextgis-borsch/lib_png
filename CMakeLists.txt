@@ -605,7 +605,7 @@ if(PNG_STATIC)
     # msvc does not append 'lib' - do it here to have consistent name
     set_target_properties(png_static PROPERTIES PREFIX "lib")
   endif()
-  # target_link_extlibraries(png_static)
+  target_link_extlibraries(png_static)
 endif()
 
 if(PNG_FRAMEWORK)
