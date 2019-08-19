@@ -1,6 +1,7 @@
 .,.,,"ANNOUNCE,CHANGES,INSTALL,LICENSE,README,h,c,3,5,in,png,dfa"
 arm,arm,,*
 contrib,contrib,,txt
+contrib/arm-neon,contrib/arm-neon,,c
 contrib/libtests,contrib/libtests,,"c,h"
 contrib/tools,contrib/tools,,"c,h"
 contrib/pngsuite,contrib/pngsuite,,png
