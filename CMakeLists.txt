@@ -94,7 +94,7 @@ if(NOT WIN32)
     NAMES m
     PATHS /usr/lib /usr/local/lib
   )
-  set(TARGET_LINK_LIB ${TARGET_LINK_LIB} ${M_LIBRARY})
+  set(TARGET_LINK_LIB ${TARGET_LINK_LIB} m)
   if(NOT M_LIBRARY)
     message(STATUS "math lib 'libm' not found; floating point support disabled")
   endif()

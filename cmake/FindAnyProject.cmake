@@ -3,8 +3,8 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, polimax@mail.ru
 ################################################################################
-# Copyright (C) 2015-2018, NextGIS <info@nextgis.com>
-# Copyright (C) 2015-2018 Dmitry Baryshnikov
+# Copyright (C) 2015-2019, NextGIS <info@nextgis.com>
+# Copyright (C) 2015-2019 Dmitry Baryshnikov
 #
 # This script is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -192,7 +192,7 @@ function(find_anyproject name)
             message(WARNING "${name} not found and will be disabled in ${PROJECT_NAME}!")
         endif()
     endif()
-
+    
     if(${UPPER_NAME}_INCLUDE_DIRS)
         include_directories(${${UPPER_NAME}_INCLUDE_DIRS})
     elseif(${UPPER_NAME}_INCLUDE_DIR)
@@ -203,6 +203,10 @@ function(find_anyproject name)
         include_directories(${${name}_INCLUDE_DIR})
     endif()
 
+    if(${UPPER_NAME} STREQUAL ZLIB AND BUILD_STATIC_LIBS AND UNIX)
+        set(TARGET_LINK_LIB ${TARGET_LINK_LIB} z)
+        set(${UPPER_NAME}_LIBRARIES z)
+    else()
     if(${UPPER_NAME}_LIBRARIES)
         set(TARGET_LINK_LIB ${TARGET_LINK_LIB} ${${UPPER_NAME}_LIBRARIES})
     elseif(${UPPER_NAME}_LIBRARY)
@@ -211,6 +215,7 @@ function(find_anyproject name)
         set(TARGET_LINK_LIB ${TARGET_LINK_LIB} ${${name}_LIBRARIES})
     elseif(${name}_LIBRARY)
         set(TARGET_LINK_LIB ${TARGET_LINK_LIB} ${${name}_LIBRARY})
+    endif()
     endif()
 
     set(TARGET_LINK_LIB ${TARGET_LINK_LIB} PARENT_SCOPE)
