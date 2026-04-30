@@ -13,17 +13,49 @@
 
 set(TEST_OPTIONS "@TEST_OPTIONS@")
 set(TEST_FILES "@TEST_FILES@")
+if(NOT DEFINED TEST_PATH_DIRS)
+  set(TEST_PATH_DIRS "@TEST_PATH_DIRS@")
+endif()
 
 foreach(file ${TEST_FILES})
   file(TO_NATIVE_PATH "${file}" native_file)
   list(APPEND NATIVE_TEST_FILES "${native_file}")
 endforeach()
 
-# Add the directory containing libpng to the PATH (Windows only)
+# Add runtime DLL directories to PATH (Windows only).
 if(WIN32)
-  get_filename_component(LIBPNG_DIR "${LIBPNG}" PATH)
-  file(TO_NATIVE_PATH "${LIBPNG_DIR}" LIBPNG_DIR)
-  set(ENV{PATH} "${LIBPNG_DIR};$ENV{PATH}")
+  set(NATIVE_TEST_PATH_DIRS "")
+  foreach(path_dir ${TEST_PATH_DIRS})
+    if(NOT path_dir STREQUAL "")
+      file(TO_NATIVE_PATH "${path_dir}" native_path_dir)
+      list(APPEND NATIVE_TEST_PATH_DIRS "${native_path_dir}")
+    endif()
+  endforeach()
+
+  # Add likely third-party DLL directories used by external dependencies
+  # (e.g. zlib resolved through borsch) relative to the test binary root.
+  get_filename_component(TEST_COMMAND_DIR "${TEST_COMMAND}" DIRECTORY)
+  get_filename_component(TEST_BUILD_ROOT "${TEST_COMMAND_DIR}" DIRECTORY)
+  get_filename_component(TEST_CONFIG_DIR "${TEST_COMMAND_DIR}" NAME)
+  if(EXISTS "${TEST_BUILD_ROOT}/third-party")
+    file(GLOB_RECURSE THIRD_PARTY_BIN_DIRS
+         LIST_DIRECTORIES true
+         "${TEST_BUILD_ROOT}/third-party/install/*/bin"
+         "${TEST_BUILD_ROOT}/third-party/build/*-build/${TEST_CONFIG_DIR}")
+    foreach(path_dir ${THIRD_PARTY_BIN_DIRS})
+      if(IS_DIRECTORY "${path_dir}")
+        file(TO_NATIVE_PATH "${path_dir}" native_path_dir)
+        list(APPEND NATIVE_TEST_PATH_DIRS "${native_path_dir}")
+      endif()
+    endforeach()
+  endif()
+
+  list(REMOVE_DUPLICATES NATIVE_TEST_PATH_DIRS)
+
+  if(NATIVE_TEST_PATH_DIRS)
+    string(JOIN ";" TEST_PATH_PREFIX ${NATIVE_TEST_PATH_DIRS})
+    set(ENV{PATH} "${TEST_PATH_PREFIX};$ENV{PATH}")
+  endif()
 endif()
 
 string(JOIN " " TEST_COMMAND_STRING "${TEST_COMMAND}" ${TEST_OPTIONS} ${NATIVE_TEST_FILES})
