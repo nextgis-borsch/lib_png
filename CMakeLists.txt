@@ -35,6 +35,12 @@ include(GNUInstallDirs)
 list(APPEND CMAKE_MODULE_PATH
   "${CMAKE_CURRENT_SOURCE_DIR}/external/borsch/cmake"
   "${CMAKE_CURRENT_SOURCE_DIR}/external/borsch/cmake/modules")
+include(version)
+report_version(libpng "${PNGLIB_VERSION}")
+write_version("${CMAKE_CURRENT_SOURCE_DIR}/png.h"
+              "${PNGLIB_MAJOR}"
+              "${PNGLIB_MINOR}"
+              "${PNGLIB_REVISION}")
 
 # Allow the users to specify an application-specific API prefix for libpng
 # vendoring purposes. A standard libpng build should have no such prefix.
@@ -1212,6 +1218,28 @@ if(NOT SKIP_INSTALL_CONFIG_FILE AND NOT SKIP_INSTALL_ALL)
                 "${CMAKE_CURRENT_BINARY_DIR}/PNGConfigVersion.cmake"
           DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PNG")
 endif()
+
+if(NOT DEFINED PACKAGE_VENDOR)
+  set(PACKAGE_VENDOR NextGIS)
+endif()
+
+# Keep borsch package naming consistent with current build variant.
+if(PNG_STATIC AND NOT PNG_SHARED)
+  set(BUILD_STATIC_LIBS ON)
+else()
+  set(BUILD_STATIC_LIBS OFF)
+endif()
+
+include(packaging)
+set(PNG_BORSCH_HEADERS_DIR "${CMAKE_CURRENT_BINARY_DIR}/borsch-headers")
+file(MAKE_DIRECTORY "${PNG_BORSCH_HEADERS_DIR}")
+create_borsch_package(libpng
+                      VENDOR ${PACKAGE_VENDOR}
+                      VERSION ${PNGLIB_VERSION}
+                      TARGETS ${PNG_LIBRARY_TARGETS}
+                      COMPATIBILITY AnyNewerVersion
+                      HEADERS ${libpng_public_hdrs}
+                      HEADERS_DIRS "${PNG_BORSCH_HEADERS_DIR}")
 
 # TODO: Create MSVC import lib for MinGW-compiled shared lib.
 # pexports libpng.dll > libpng.def
