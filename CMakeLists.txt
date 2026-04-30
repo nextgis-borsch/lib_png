@@ -32,6 +32,9 @@ project(libpng
 include(CheckCSourceCompiles)
 include(CheckLibraryExists)
 include(GNUInstallDirs)
+list(APPEND CMAKE_MODULE_PATH
+  "${CMAKE_CURRENT_SOURCE_DIR}/external/borsch/cmake"
+  "${CMAKE_CURRENT_SOURCE_DIR}/external/borsch/cmake/modules")
 
 # Allow the users to specify an application-specific API prefix for libpng
 # vendoring purposes. A standard libpng build should have no such prefix.
@@ -137,9 +140,18 @@ if(PNG_BUILD_ZLIB)
   endif()
 endif()
 
-# Find the zlib library.
-find_package(ZLIB REQUIRED)
-set(PNG_LINK_LIBRARIES ZLIB::ZLIB)
+# Find zlib through borsch/system package integration.
+include(FindAnyProject)
+find_anyproject(ZLIB REQUIRED)
+if(TARGET ZLIB::ZLIB)
+  set(PNG_LINK_LIBRARIES ZLIB::ZLIB)
+elseif(DEFINED ZLIB_LIBRARIES AND NOT ZLIB_LIBRARIES STREQUAL "")
+  set(PNG_LINK_LIBRARIES ${ZLIB_LIBRARIES})
+elseif(DEFINED ZLIB_LIBRARY AND NOT ZLIB_LIBRARY STREQUAL "")
+  set(PNG_LINK_LIBRARIES ${ZLIB_LIBRARY})
+else()
+  message(FATAL_ERROR "Failed to resolve zlib link libraries")
+endif()
 
 # Find the math library (unless we already know it's not available or
 # not needed).

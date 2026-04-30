@@ -1,0 +1,4 @@
+[submodule "external/borsch"]
+	path = external/borsch
+	url = https://github.com/nextgis-borsch/borsch.git
+	branch = master
